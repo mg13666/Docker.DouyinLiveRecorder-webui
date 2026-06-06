@@ -21,15 +21,19 @@ DouyinLiveRecorder 是一款简易的多平台直播录制工具，基于 FFmpeg
 - 录制文件自动保存
 - **新增 WebUI：可通过网页界面管理和修改配置文件**
 
-### 2025.10.31 更新
+## 更新日志
+
+### 2026.06.06
+
+- **修复**：小红书短链接（`xhslink.com`）录制 JSON 解析失败 → `window.__INITIAL_STATE__` 含 `undefined` 导致 `json.loads()` 崩溃
+- **优化**：日志显示逻辑重构
+  - `webui.py`：`get_log()` 从末尾反向扫描，以「共监测」为锚点提取最新日志组
+- **优化**：WebUI 交互体验
+  - `templates/index.html`：Tab 无刷新切换、表单 AJAX 提交、Toast 提示、移动端适配优化
+
+### 2025.10.31
 
 - **新增**：onebot 协议通知推送
-
-### 2026.06.06 修复
-
-- **修复**：日志显示逻辑重构 & UI优化
-  - `webui.py`：`get_log()` 从末尾反向扫描，以「共监测」为锚点提取最新日志组
-  - `templates/index.html`：Tab 无刷新切换、表单 AJAX 提交、Toast 提示、移动端适配优化
 
 <img width="367" height="268" alt="image" src="https://github.com/user-attachments/assets/6ba3f5aa-b33f-4f7e-b898-e488a6070c58" />
 
