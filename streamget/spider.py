@@ -752,6 +752,7 @@ async def get_xhs_stream_url(url: str, proxy_addr: OptionalStr = None, cookies: 
     if room_id:
         html_str = await async_req(url, proxy_addr=proxy_addr, headers=headers)
         json_str = re.search('window.__INITIAL_STATE__=(.*?)</script>', html_str, re.S).group(1)
+        json_str = json_str.replace('undefined', 'null')
         json_data = json.loads(json_str)
         room_data = json_data['liveStream']['roomData']
         anchor_name = room_data['hostInfo']['nickName']
