@@ -151,21 +151,43 @@ def account_settings_page():
 @app.route('/log')
 def get_log():
     log_content = []
-    log_files = [
-        os.path.join(os.getcwd(), 'logs', 'streamget.log'),
-        os.path.join(os.getcwd(), 'logs', 'PlayURL.log')
-    ]
-    for log_file in log_files:
-        if os.path.exists(log_file):
-            try:
-                with open(log_file, 'r', encoding='utf-8') as f:
-                    # 读取所有行并只保留最后100行
-                    lines = f.readlines()
-                    log_content.extend(lines[-100:] if len(lines) >
-                                       100 else lines)
-            except Exception as e:
-                log_content.append(f"Error reading {log_file}: {e}\n")
-    return "".join(log_content)
+    log_file = os.path.join(os.getcwd(), 'logs', 'PlayURL.log')
+    if os.path.exists(log_file):
+        try:
+            with open(log_file, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            # 从后往前找最新一组日志：遇到"共监测"开始收集，直到收集到足够信息
+            mon = rec = detail = other = None
+            for i in range(len(lines) - 1, -1, -1):
+                s = lines[i].strip()
+                if not s:
+                    continue
+                if 'xxxx' in s.lower():
+                    continue
+                if 'ERROR' in s or 'WebUI启动' in s:
+                    continue
+                if '序号' in s and detail is None:
+                    detail = s
+                elif '正在录制' in s and rec is None:
+                    rec = s
+                elif '没有正在录制' in s and other is None:
+                    other = s
+                elif '共监测' in s and mon is None:
+                    mon = s
+                    break  # 找到共监测就停止，这是该组的开头
+            if mon:
+                log_content.append(mon)
+                if rec:
+                    log_content.append(rec)
+                if detail:
+                    log_content.append(detail)
+                if other:
+                    log_content.append(other)
+        except Exception as e:
+            return f"Error reading log: {e}"
+    if not log_content:
+        return "暂无日志"
+    return "\n".join(log_content)
 
 
 if __name__ == '__main__':

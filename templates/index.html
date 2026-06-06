@@ -2,343 +2,374 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DouyinLiveRecorder 配置</title>
-        <style>
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                margin: 20px;
-                background-color: #f4f7f6;
-                color: #333;
-            }
-            .container {
-                max-width: 900px;
-                margin: 0 auto;
-                background-color: #fff;
-                padding: 30px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            }
-            h1 {
-                color: #0056b3;
-                text-align: center;
-                margin-bottom: 30px;
-                font-size: 2em;
-            }
-            .tabs {
-                display: flex;
-                justify-content: center;
-                margin-bottom: 20px;
-                border-bottom: 2px solid #e1e1e1;
-            }
-            .tab-button {
-                padding: 10px 20px;
-                text-decoration: none;
-                color: #0056b3;
-                font-weight: bold;
-                border: 1px solid transparent;
-                border-bottom: none;
-                border-radius: 5px 5px 0 0;
-                transition: all 0.3s ease;
-            }
-            .tab-button:hover {
-                background-color: #e9ecef;
-            }
-            .tab-button.active {
-                background-color: #0056b3;
-                color: white;
-                border-color: #0056b3;
-            }
-            .config-section {
-                background-color: #f9f9f9;
-                border: 1px solid #e1e1e1;
-                border-radius: 6px;
-                padding: 20px;
-                margin-bottom: 25px;
-            }
-            h2 {
-                color: #0056b3;
-                margin-top: 0;
-                border-bottom: 2px solid #e1e1e1;
-                padding-bottom: 10px;
-                margin-bottom: 20px;
-                font-size: 1.5em;
-            }
-            h3 {
-                color: #007bff;
-                margin-top: 15px;
-                margin-bottom: 10px;
-                font-size: 1.2em;
-            }
-            .form-group {
-                margin-bottom: 15px;
-            }
-            label {
-                display: block;
-                margin-bottom: 5px;
-                font-weight: bold;
-                color: #555;
-            }
-            input[type="text"],
-            textarea {
-                width: calc(100% - 22px);
-                padding: 10px;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                font-size: 1em;
-                box-sizing: border-box;
-                transition: border-color 0.3s;
-            }
-            input[type="text"]:focus,
-            textarea:focus {
-                border-color: #007bff;
-                outline: none;
-            }
-            button[type="submit"] {
-                background-color: #28a745;
-                color: white;
-                padding: 12px 25px;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-                font-size: 1.1em;
-                transition: background-color 0.3s ease;
-                display: block;
-                width: 100%;
-                margin-top: 30px;
-            }
-            button[type="submit"]:hover {
-                background-color: #218838;
-            }
-        </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>LiveRecorder 控制台</title>
+    <style>
+        :root {
+            --accent: #60A5FA;
+            --accent-hover: #93BBFD;
+            --bg: #0F172A;
+            --surface: rgba(30,41,59,.7);
+            --surface-solid: #1E293B;
+            --border: rgba(148,163,184,.12);
+            --text: #E2E8F0;
+            --text-secondary: #94A3B8;
+            --text-muted: #64748B;
+            --success: #34D399;
+            --error: #F87171;
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --safe-bottom: env(safe-area-inset-bottom, 12px);
+            --font-mono: 'SF Mono', 'Cascadia Code', 'Noto Sans Mono', monospace;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: var(--safe-bottom);
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+        }
+        .top-bar {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(15,23,42,.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 20px;
+            font-size: 1.15rem; font-weight: 600;
+            display: flex; align-items: center; gap: 10px;
+            color: var(--text);
+        }
+        .top-bar .logo { 
+            width: 36px; height: 36px; 
+            background: var(--accent);
+            color: #0F172A;
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; font-weight: 700;
+        }
+        .tab-bar-outer {
+            position: sticky; top: 56px; z-index: 99;
+            background: rgba(15,23,42,.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        .tab-bar {
+            display: flex; overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            gap: 4px; padding: 8px 12px;
+        }
+        .tab-bar::-webkit-scrollbar { display: none; }
+        .tab {
+            flex-shrink: 0; scroll-snap-align: start;
+            padding: 8px 16px; border-radius: 999px;
+            font-size: .825rem; font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none; white-space: nowrap;
+            transition: all .2s; border: 1px solid var(--border);
+            background: rgba(255,255,255,.04);
+        }
+        .tab:hover { background: rgba(96,165,250,.15); color: var(--accent); }
+        .tab.active {
+            background: var(--accent);
+            color: #0F172A; font-weight: 600;
+            border-color: var(--accent);
+        }
+        .content { padding: 16px; max-width: 720px; margin: 0 auto; }
+        .card {
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px; margin-bottom: 16px;
+        }
+        .card h2 {
+            font-size: 1.05rem; color: var(--text);
+            margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px;
+            font-weight: 600;
+        }
+        .log-box {
+            background: rgba(0,0,0,.4); color: #A7F3D0;
+            font-family: var(--font-mono); font-size: .78rem;
+            padding: 14px; border-radius: var(--radius-sm);
+            max-height: 360px; overflow-y: auto;
+            white-space: pre-wrap; word-break: break-all;
+            line-height: 1.6;
+            border: 1px solid rgba(255,255,255,.06);
+            transition: opacity .15s;
+        }
+        .form-group { margin-bottom: 16px; }
+        label {
+            display: block; font-size: .78rem; font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            letter-spacing: .2px;
+        }
+        input[type="text"], input[type="password"], textarea, select {
+            width: 100%; padding: 11px 14px; font-size: .95rem;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: rgba(255,255,255,.04);
+            color: var(--text);
+            transition: border-color .2s, box-shadow .2s;
+            -webkit-appearance: none; font-family: inherit;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none; border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(96,165,250,.15);
+        }
+        textarea {
+            min-height: 200px; font-family: var(--font-mono); font-size: .85rem;
+        }
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z' fill='%2394A3B8'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 36px;
+        }
+        .btn-bar { display: flex; justify-content: flex-end; margin-top: 4px; }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 6px; padding: 11px 26px; font-size: .9rem; font-weight: 600;
+            border: none; border-radius: var(--radius-sm); cursor: pointer;
+            transition: all .2s; font-family: inherit;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-primary {
+            background: var(--accent); color: #0F172A;
+            box-shadow: 0 2px 12px rgba(96,165,250,.25);
+        }
+        .btn-primary:active { transform: scale(0.97); box-shadow: none; }
+        .btn-primary:disabled { opacity: .4; pointer-events: none; }
+        .toast {
+            position: fixed; top: 24px; left: 50%;
+            transform: translateX(-50%); z-index: 999;
+            background: var(--text); color: #0F172A;
+            padding: 12px 24px; border-radius: var(--radius-sm);
+            font-weight: 600; font-size: .88rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,.4);
+            animation: toastIn .3s ease;
+        }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+        }
+        .toast.fade { opacity: 0; transition: opacity .4s; }
+        @media (min-width: 600px) {
+            .content { padding: 24px; }
+            .card { padding: 24px; }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>DouyinLiveRecorder Configuration</h1>
-        <div class="tabs">
-                <a href="{{ url_for('home_page') }}" class="tab-button {% if active_tab == 'home' %}active{% endif %}">首页</a>
-                <a href="{{ url_for('url_config_page') }}" class="tab-button {% if active_tab == 'url_config' %}active{% endif %}">URL 配置</a>
-                <a href="{{ url_for('recording_settings_page') }}" class="tab-button {% if active_tab == 'recording_settings' %}active{% endif %}">录制设置</a>
-                <a href="{{ url_for('push_settings_page') }}" class="tab-button {% if active_tab == 'push_settings' %}active{% endif %}">推送配置</a>
-                <a href="{{ url_for('cookie_settings_page') }}" class="tab-button {% if active_tab == 'cookie_settings' %}active{% endif %}">Cookie</a>
-                <a href="{{ url_for('account_settings_page') }}" class="tab-button {% if active_tab == 'account_settings' %}active{% endif %}">账号密码</a>
-            </div>
-
-            {% if active_tab == 'home' %}
-            <div class="config-section">
-                <h2>首页</h2>
-                <h3>日志输出:</h3>
-                <pre id="log_output" style="background-color: #eee; padding: 10px; border-radius: 5px; max-height: 400px; overflow-y: scroll;"></pre>
-            </div>
-            {% elif active_tab == 'url_config' %}
-            <div class="config-section">
-                <form action="{{ url_for('url_config_page') }}" method="post">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h2>URL Configuration (URL_config.ini)</h2>
-                        <button type="submit" style="margin: 0; width: auto; padding: 8px 15px;">保存 URL 配置</button>
-                    </div>
-                    <div class="form-group">
-                        <label for="url_config_content">编辑 URL (每行一个):</label>
-                        <textarea id="url_config_content" name="url_config_content" rows="15">{{ url_config_content }}</textarea>
-                    </div>
-                </form>
-            </div>
-            {% elif active_tab == 'recording_settings' %}
-            <div class="config-section">
-                <form action="{{ url_for('recording_settings_page') }}" method="post">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h2>录制设置 (config.ini - [Recording])</h2>
-                        <button type="submit" style="margin: 0; width: auto; padding: 8px 15px;">保存录制设置</button>
-                    </div>
-                    {% for key, value in config.items(section) %}
-                    <div class="form-group">
-                        <label for="{{ key }}">{{ key }}:</label>
-                        {% if key in ['是否跳过代理检测(是/否)', '保存文件夹是否以作者区分', '保存文件夹是否以时间区分', '保存文件夹是否以标题区分', '保存文件名是否包含标题', '是否去除名称中的表情符号', '是否使用代理ip(是/否)', '是否显示循环秒数', '是否显示直播源地址', '分段录制是否开启', '是否强制启用https录制', '录制完成后自动转为mp4格式', 'mp4格式重新编码为h264', '追加格式后删除原文件', '生成时间字幕文件', '是否录制完成后执行自定义脚本'] %}
-                        <select id="{{ key }}" name="{{ key }}" style="height: 38px; width: 200px;">
-                              <option value="是" {% if value == '是' %}selected{% endif %}>是</option>
-                              <option value="否" {% if value == '否' %}selected{% endif %}>否</option>
-                          </select>
-                        {% else %}
-                        <input type="text" id="{{ key }}" name="{{ key }}" value="{{ value }}">
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </form>
-            </div>
-            {% elif active_tab == 'push_settings' %}
-            <div class="config-section">
-                <form action="{{ url_for('push_settings_page') }}" method="post">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h2>推送配置 (config.ini - [Push])</h2>
-                        <button type="submit" style="margin: 0; width: auto; padding: 8px 15px;">保存推送配置</button>
-                    </div>
-                    {% for key, value in config.items(section) %}
-                    <div class="form-group">
-                        <label for="{{ key }}">{{ key }}:</label>
-                        {% if key == '直播状态推送渠道' %}
-                        <select id="{{ key }}" name="{{ key }}" style="height: 38px; width: 200px;">
-                            <option value="">请选择</option>
-                            <option value="OneBot" {% if value == 'OneBot' %}selected{% endif %}>OneBot</option>
-                            <option value="钉钉" {% if value == '钉钉' %}selected{% endif %}>钉钉</option>
-                            <option value="微信" {% if value == '微信' %}selected{% endif %}>微信</option>
-                            <option value="Bark" {% if value == 'Bark' %}selected{% endif %}>Bark</option>
-                            <option value="Gotify" {% if value == 'Gotify' %}selected{% endif %}>Gotify</option>
-                            <option value="TG" {% if value == 'TG' %}selected{% endif %}>TG</option>
-                            <option value="ntfy" {% if value == 'ntfy' %}selected{% endif %}>ntfy</option>
-                            <option value="邮箱" {% if value == '邮箱' %}selected{% endif %}>邮箱</option>
-                        </select>
-                        {% elif key in ['是否跳过代理检测(是/否)', '保存文件夹是否以作者区分', '保存文件夹是否以时间区分', '保存文件夹是否以标题区分', '保存文件名是否包含标题', '是否去除名称中的表情符号', '是否使用代理ip(是/否)', '是否显示循环秒数', '是否显示直播源地址', '分段录制是否开启', '是否强制启用https录制', '录制完成后自动转为mp4格式', 'mp4格式重新编码为h264', '追加格式后删除原文件', '生成时间字幕文件', '是否录制完成后执行自定义脚本'] %}
-                        <select id="{{ key }}" name="{{ key }}" style="height: 38px; width: 200px;">
-                              <option value="是" {% if value == '是' %}selected{% endif %}>是</option>
-                              <option value="否" {% if value == '否' %}selected{% endif %}>否</option>
-                          </select>
-                        {% else %}
-                        <input type="text" id="{{ key }}" name="{{ key }}" value="{{ value }}">
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </form>
-            </div>
-            {% elif active_tab == 'cookie_settings' %}
-            <div class="config-section">
-                <form action="{{ url_for('cookie_settings_page') }}" method="post">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h2>Cookie (config.ini - [Cookie])</h2>
-                        <button type="submit" style="margin: 0; width: auto; padding: 8px 15px;">保存 Cookie</button>
-                    </div>
-                    {% for key, value in config.items(section) %}
-                    <div class="form-group">
-                        <label for="{{ key }}">{{ key }}:</label>
-                        {% if key in ['是否跳过代理检测(是/否)', '保存文件夹是否以作者区分', '保存文件夹是否以时间区分', '保存文件夹是否以标题区分', '保存文件名是否包含标题', '是否去除名称中的表情符号', '是否使用代理ip(是/否)', '是否显示循环秒数', '是否显示直播源地址', '分段录制是否开启', '是否强制启用https录制', '录制完成后自动转为mp4格式', 'mp4格式重新编码为h264', '追加格式后删除原文件', '生成时间字幕文件', '是否录制完成后执行自定义脚本'] %}
-                        <select id="{{ key }}" name="{{ key }}" style="height: 38px; width: 200px;">
-                              <option value="是" {% if value == '是' %}selected{% endif %}>是</option>
-                              <option value="否" {% if value == '否' %}selected{% endif %}>否</option>
-                          </select>
-                        {% else %}
-                        <input type="text" id="{{ key }}" name="{{ key }}" value="{{ value }}">
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </form>
-            </div>
-            {% elif active_tab == 'account_settings' %}
-            <div class="config-section">
-                <form action="{{ url_for('account_settings_page') }}" method="post">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h2>账号密码 (config.ini - [Account])</h2>
-                        <button type="submit" style="margin: 0; width: auto; padding: 8px 15px;">保存账号密码</button>
-                    </div>
-                    {% for key, value in config.items(section) %}
-                    <div class="form-group">
-                        <label for="{{ key }}">{{ key }}:</label>
-                        {% if key in ['是否跳过代理检测(是/否)', '保存文件夹是否以作者区分', '保存文件夹是否以时间区分', '保存文件夹是否以标题区分', '保存文件名是否包含标题', '是否去除名称中的表情符号', '是否使用代理ip(是/否)', '是否显示循环秒数', '是否显示直播源地址', '分段录制是否开启', '是否强制启用https录制', '录制完成后自动转为mp4格式', 'mp4格式重新编码为h264', '追加格式后删除原文件', '生成时间字幕文件', '是否录制完成后执行自定义脚本'] %}
-                        <select id="{{ key }}" name="{{ key }}" style="height: 38px; width: 200px;">
-                              <option value="是" {% if value == '是' %}selected{% endif %}>是</option>
-                              <option value="否" {% if value == '否' %}selected{% endif %}>否</option>
-                          </select>
-                        {% else %}
-                        <input type="text" id="{{ key }}" name="{{ key }}" value="{{ value }}">
-                        {% endif %}
-                    </div>
-                    {% endfor %}
-                </form>
-            </div>
-            {% endif %}
+    <div class="top-bar">
+        <div class="logo">🎙</div>
+        LiveRecorder
+    </div>
+    <div class="tab-bar-outer">
+        <div class="tab-bar" id="tabBar">
+            <a href="{{ url_for('home_page') }}" class="tab {% if active_tab == 'home' %}active{% endif %}">🏠 首页</a>
+            <a href="{{ url_for('url_config_page') }}" class="tab {% if active_tab == 'url_config' %}active{% endif %}">🔗 URL 配置</a>
+            <a href="{{ url_for('recording_settings_page') }}" class="tab {% if active_tab == 'recording_settings' %}active{% endif %}">⚙️ 录制设置</a>
+            <a href="{{ url_for('push_settings_page') }}" class="tab {% if active_tab == 'push_settings' %}active{% endif %}">🔔 推送配置</a>
+            <a href="{{ url_for('cookie_settings_page') }}" class="tab {% if active_tab == 'cookie_settings' %}active{% endif %}">🍪 Cookie</a>
+            <a href="{{ url_for('account_settings_page') }}" class="tab {% if active_tab == 'account_settings' %}active{% endif %}">🔑 账号密码</a>
+        </div>
+    </div>
+    <div class="content">
+        {% if active_tab == 'home' %}
+        <div class="card">
+            <h2>📋 实时日志</h2>
+            <div class="log-box" id="log_output">加载中…</div>
+        </div>
+        {% elif active_tab == 'url_config' %}
+        <div class="card">
+            <form action="{{ url_for('url_config_page') }}" method="post">
+                <h2>🔗 URL 配置</h2>
+                <div class="form-group">
+                    <label for="url_config_content">编辑 URL（每行一个）</label>
+                    <textarea id="url_config_content" name="url_config_content">{{ url_config_content }}</textarea>
+                </div>
+                <div class="btn-bar">
+                    <button type="submit" class="btn btn-primary">💾 保存 URL 配置</button>
+                </div>
+            </form>
+        </div>
+        {% elif active_tab in ('recording_settings', 'push_settings', 'cookie_settings', 'account_settings') %}
+        {% set titles = {
+            'recording_settings': '⚙️ 录制设置',
+            'push_settings': '🔔 推送配置',
+            'cookie_settings': '🍪 Cookie',
+            'account_settings': '🔑 账号密码'
+        } %}
+        {% set routes = {
+            'recording_settings': 'recording_settings_page',
+            'push_settings': 'push_settings_page',
+            'cookie_settings': 'cookie_settings_page',
+            'account_settings': 'account_settings_page'
+        } %}
+        <div class="card">
+            <form action="{{ url_for(routes[active_tab]) }}" method="post">
+                <h2>{{ titles.get(active_tab, '设置') }}</h2>
+                {% for key, value in config.items(section) %}
+                <div class="form-group">
+                    <label for="{{ key }}">{{ key }}</label>
+                    {% if key in ['是否跳过代理检测(是/否)', '保存文件夹是否以作者区分', '保存文件夹是否以时间区分', '保存文件夹是否以标题区分', '保存文件名是否包含标题', '是否去除名称中的表情符号', '是否使用代理ip(是/否)', '是否显示循环秒数', '是否显示直播源地址', '分段录制是否开启', '是否强制启用https录制', '录制完成后自动转为mp4格式', 'mp4格式重新编码为h264', '追加格式后删除原文件', '生成时间字幕文件', '是否录制完成后执行自定义脚本'] %}
+                    <select id="{{ key }}" name="{{ key }}">
+                        <option value="是" {% if value == '是' %}selected{% endif %}>是</option>
+                        <option value="否" {% if value == '否' %}selected{% endif %}>否</option>
+                    </select>
+                    {% elif key == '直播状态推送渠道' %}
+                    <select id="{{ key }}" name="{{ key }}">
+                        <option value="">请选择</option>
+                        <option value="OneBot" {% if value == 'OneBot' %}selected{% endif %}>OneBot</option>
+                        <option value="钉钉" {% if value == '钉钉' %}selected{% endif %}>钉钉</option>
+                        <option value="微信" {% if value == '微信' %}selected{% endif %}>微信</option>
+                        <option value="Bark" {% if value == 'Bark' %}selected{% endif %}>Bark</option>
+                        <option value="Gotify" {% if value == 'Gotify' %}selected{% endif %}>Gotify</option>
+                        <option value="TG" {% if value == 'TG' %}selected{% endif %}>TG</option>
+                        <option value="ntfy" {% if value == 'ntfy' %}selected{% endif %}>ntfy</option>
+                        <option value="邮箱" {% if value == '邮箱' %}selected{% endif %}>邮箱</option>
+                    </select>
+                    {% else %}
+                    <input type="text" id="{{ key }}" name="{{ key }}" value="{{ value }}">
+                    {% endif %}
+                </div>
+                {% endfor %}
+                <div class="btn-bar">
+                    <button type="submit" class="btn btn-primary">💾 保存设置</button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
     </div>
     <script>
-        let lastLogContent = '';
-        function fetchLog() {
-            fetch('/log')
-                .then(response => response.text())
-                .then(data => {
-                    const logOutput = document.getElementById('log_output');
-                    if (data !== lastLogContent) {
-                        logOutput.innerText = data;
-                        logOutput.scrollTop = logOutput.scrollHeight;
-                        lastLogContent = data;
+        (function(){
+            const active = document.querySelector('.tab.active');
+            if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        })();
+
+        // ===== Tab 无刷新切换 =====
+        const HOME_HTML = '<div class="card"><h2>📋 实时日志</h2><div class="log-box" id="log_output">加载中…</div></div>';
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                const url = this.getAttribute('href');
+                const isHome = url.includes('/home') || url === '/';
+                if (isHome) {
+                    // 首页直接用本地缓存 HTML，不需要 fetch
+                    document.querySelector('.content').innerHTML = HOME_HTML;
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    this.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    document.title = 'LiveRecorder 控制台';
+                    window.history.pushState({}, '', url);
+                    lastLog = '';
+                    fetchLog();
+                    return;
+                }
+                fetch(url).then(r => r.text()).then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    // 更新 content
+                    const newContent = doc.querySelector('.content');
+                    if (newContent) {
+                        document.querySelector('.content').innerHTML = newContent.innerHTML;
                     }
-                })
-                .catch(error => console.error('Error fetching log:', error));
-        }
-
-        // Fetch log every 5 seconds
-        setInterval(fetchLog, 5000);
-
-        // Initial fetch
-        fetchLog();
-
-        // 为所有按钮添加点击反馈效果
-        document.addEventListener('DOMContentLoaded', function() {
-            // 获取所有表单
-            const forms = document.querySelectorAll('form');
-            
-            forms.forEach(form => {
-                form.addEventListener('submit', function(event) {
-                    // 获取表单中的按钮
-                    const button = this.querySelector('button[type="submit"]');
-                    if (button) {
-                        // 保存原始文本
-                        const originalText = button.textContent;
-                        // 更改按钮文本和样式
-                        button.textContent = '处理中...';
-                        button.style.opacity = '0.7';
-                        button.style.pointerEvents = 'none';
-                        
-                        // 添加一个隐藏的输入字段，用于在后端处理完成后识别
-                        const hiddenInput = document.createElement('input');
-                        hiddenInput.type = 'hidden';
-                        hiddenInput.name = 'button_clicked';
-                        hiddenInput.value = 'true';
-                        this.appendChild(hiddenInput);
-                        
-                        // 设置超时，如果服务器没有响应，恢复按钮状态
-                        setTimeout(function() {
-                            if (button) {
-                                button.textContent = originalText;
-                                button.style.opacity = '1';
-                                button.style.pointerEvents = 'auto';
-                            }
-                        }, 5000); // 5秒后恢复
-                    }
+                    // 更新 tab 激活状态
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    this.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    // 更新标题
+                    const newTitle = doc.querySelector('title');
+                    if (newTitle) document.title = newTitle.textContent;
+                    // 重新绑定事件
+                    bindForms();
+                    // 更新 URL
+                    window.history.pushState({}, '', url);
                 });
             });
         });
 
-        // 检查URL参数，显示操作成功提示
-        window.onload = function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const success = urlParams.get('success');
-            if (success === 'true') {
-                // 创建提示元素
-                const notification = document.createElement('div');
-                notification.textContent = '操作成功！';
-                notification.style.position = 'fixed';
-                notification.style.top = '20px';
-                notification.style.left = '50%';
-                notification.style.transform = 'translateX(-50%)';
-                notification.style.backgroundColor = '#4CAF50';
-                notification.style.color = 'white';
-                notification.style.padding = '10px 20px';
-                notification.style.borderRadius = '5px';
-                notification.style.zIndex = '1000';
-                notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-                
-                // 添加到页面
-                document.body.appendChild(notification);
-                
-                // 3秒后移除
-                setTimeout(function() {
-                    notification.style.opacity = '0';
-                    notification.style.transition = 'opacity 0.5s';
-                    setTimeout(function() {
-                        document.body.removeChild(notification);
-                    }, 500);
-                }, 3000);
-                
-                // 从URL中移除参数
+        function bindForms() {
+            document.querySelectorAll('form').forEach(f => {
+                if (f.dataset.bound) return;
+                f.dataset.bound = '1';
+                f.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const btn = this.querySelector('.btn');
+                    if (btn) { btn.disabled = true; btn.textContent = '⏳ 处理中…'; }
+                    const formData = new FormData(this);
+                    fetch(this.action, { method: 'POST', body: formData }).then(r => {
+                        const finalUrl = r.url;
+                        return r.text().then(html => ({ html, finalUrl }));
+                    }).then(({ html, finalUrl }) => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newContent = doc.querySelector('.content');
+                        if (newContent) {
+                            document.querySelector('.content').innerHTML = newContent.innerHTML;
+                        }
+                        bindForms();
+                        window.history.pushState({}, '', finalUrl);
+                        // toast
+                        showToast('✅ 操作成功！');
+                    }).catch(() => {
+                        if (btn) { btn.disabled = false; btn.textContent = '💾 保存设置'; }
+                    });
+                });
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => { toast.classList.add('fade'); setTimeout(() => toast.remove(), 400); }, 2500);
+        }
+        let lastLog = '';
+        let fetching = false;
+        function fetchLog() {
+            if (fetching) return;
+            fetching = true;
+            fetch('/log').then(r => r.text()).then(data => {
+                const el = document.getElementById('log_output');
+                if (!el) { fetching = false; return; }
+                if (data && data !== lastLog) {
+                    el.style.transition = 'opacity .15s';
+                    el.style.opacity = '0';
+                    setTimeout(() => {
+                        el.textContent = data;
+                        el.scrollTop = el.scrollHeight;
+                        el.style.opacity = '1';
+                        lastLog = data;
+                    }, 150);
+                }
+                fetching = false;
+            }).catch(() => { fetching = false; });
+        }
+        setInterval(fetchLog, 5000);
+        fetchLog();
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('success') === 'true') {
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.textContent = '✅ 操作成功！';
+                document.body.appendChild(toast);
+                setTimeout(() => { toast.classList.add('fade'); setTimeout(() => toast.remove(), 400); }, 2500);
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
-        };
+        })();
     </script>
 </body>
 </html>
